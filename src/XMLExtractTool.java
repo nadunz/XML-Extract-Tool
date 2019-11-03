@@ -51,9 +51,10 @@ public class XMLExtractTool extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         // initialize the file chooser
         this.fc = new JFileChooser();
-        // add two extention filter for the file chooser
+        // add 3 extention filters for the file chooser
         this.fc.addChoosableFileFilter(new FileNameExtensionFilter("Extensible Markup Language file (.xml)", "xml"));
         this.fc.addChoosableFileFilter(new FileNameExtensionFilter("Text Document (.txt)", "txt"));
+        this.fc.addChoosableFileFilter(new FileNameExtensionFilter("Rust File (.rs)", "rs"));
         // initialize the list model
         this.dlm = new DefaultListModel();
         // initialize the selected tags list
@@ -94,7 +95,7 @@ public class XMLExtractTool extends javax.swing.JFrame {
      */
     private File[] addFiles(){
         // set title for the file chooser
-        fc.setDialogTitle("Choose a XML file");
+        fc.setDialogTitle("Choose a Input file");
         // selection mode
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         // set enable the multi selection
@@ -114,7 +115,7 @@ public class XMLExtractTool extends javax.swing.JFrame {
      */
     private File[] addAllInFolder(){
         // set title for the file chooser
-        fc.setDialogTitle("Choose a folder to add all XML files");
+        fc.setDialogTitle("Choose a folder to add all Input files");
         // selection mode
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         // set disable the multi selection
@@ -147,17 +148,21 @@ public class XMLExtractTool extends javax.swing.JFrame {
     /**
      * 
      * @param filePath - path of the given file
-     * @param ex - expected extention
-     * @return whether the file is in expected extention
+     * @param ex - expected extentions separated by comma
+     * @return whether the file is in expected extentions
      */
-    private boolean isFileWithExtension(String filePath, String ex){
+    private boolean isFileWithExtensions(String filePath, String exts){
         int i = filePath.lastIndexOf('.');
+        // get all the given extensions
+        String[] extensions = exts.split(",");
         if (i > 0 &&  i < filePath.length() - 1) {
             // take the extension
             String extension = filePath.substring(i + 1).toLowerCase();
-            // and check whether the extention is similar to the expected one 
-            if (ex.equals(extension)) 
-                return true;
+            for (String ex : extensions) {
+                // and check whether the extention is similar to the expected one 
+                if (ex.equals(extension)) 
+                    return true;
+            }
         }
         return false;
     }
@@ -406,7 +411,7 @@ public class XMLExtractTool extends javax.swing.JFrame {
 
         jLabel2.setText("XML Files");
 
-        addXMLBtn.setText("Add XML Files");
+        addXMLBtn.setText("Add Input Files");
         addXMLBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addXMLBtnActionPerformed(evt);
@@ -657,8 +662,8 @@ public class XMLExtractTool extends javax.swing.JFrame {
             for (File file : allFiles) {
                 // take the path of the file
                 String filePath = file.getPath();
-                // check whether it is a xml file
-                if (isFileWithExtension(filePath, "xml")) {
+                // check whether it is a xml,rs,ts file
+                if (isFileWithExtensions(filePath, "xml,txt,rs")) {
                     dlm.addElement(file);
                 }
             }
@@ -780,8 +785,8 @@ public class XMLExtractTool extends javax.swing.JFrame {
             for (File file : allFiles) {
                 // iterate through the selected files
                 String filePath = file.getPath();
-                // check whether it is a xml file
-                if(file.isFile() && !file.isHidden() && isFileWithExtension(filePath, "xml"))
+                // check whether it is a xml,txt,rs file
+                if(file.isFile() && !file.isHidden() && isFileWithExtensions(filePath, "xml,rs,ts"))
                     dlm.addElement(filePath);
             }
         }
@@ -798,7 +803,7 @@ public class XMLExtractTool extends javax.swing.JFrame {
         if (file != null) {
             // check whether it is a txt file
             // add to txt field
-            if (isFileWithExtension(file, "txt")) {
+            if (isFileWithExtensions(file, "txt")) {
                 outputTxt.setText(file);
             }
         }
